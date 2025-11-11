@@ -10,6 +10,6 @@ EXTRAKEY_ENABLE = no
 NKRO_ENABLE = no
 AUDIO_ENABLE = no
 RGBLIGHT_ENABLE = no
-OLED_DRIVER_ENABLE = no
+OLED_ENABLE = no
 
 EXTRAFLAGS += -Wno-error=unused-const-variable
