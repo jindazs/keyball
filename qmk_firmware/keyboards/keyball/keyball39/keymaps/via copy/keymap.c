@@ -69,35 +69,3 @@ void oledkit_render_info_user(void) {
     keyball_oled_render_layerinfo();
 }
 #endif
-
-#ifdef COMBO_ENABLE
-enum combos{
-    jk_lclick,
-    kl_rclick,
-    jl_layer,
-};
-
-const uint16_t PROGMEM my_jk[] = {KC_J, KC_K, COMBO_END};
-const uint16_t PROGMEM my_kl[] = {KC_K, KC_L, COMBO_END};
-const uint16_t PROGMEM my_jl[] = {KC_J, KC_L, COMBO_END};
-
-combo_t key_combos[] = {
-
-    [jk_lclick] = COMBO(my_jk, QK_MOUSE_BUTTON_1),
-    [kl_rclick] = COMBO(my_kl, QK_MOUSE_BUTTON_2),
-    [jl_layer]  = COMBO_ACTION(my_jl),  // ← COMBO_ACTIONに変更！
-};
-
-// コンボ動作処理
-void process_combo_event(uint16_t combo_index, bool pressed) {
-    switch(combo_index) {
-        case jl_layer:
-            if (pressed) {
-                layer_on(3);  // Layer 3 を有効化
-            } else {
-                layer_off(3); // 離したら無効化（押している間のみ有効）
-            }
-            break;
-    }
-}
-#endif
