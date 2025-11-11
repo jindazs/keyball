@@ -83,8 +83,8 @@ const uint16_t PROGMEM my_jl[] = {KC_J, KC_L, COMBO_END};
 
 combo_t key_combos[] = {
 
-    [jk_lclick] = COMBO(my_jk, QK_MOUSE_BUTTON_1),
-    [kl_rclick] = COMBO(my_kl, QK_MOUSE_BUTTON_2),
+    [jk_lclick] = COMBO(my_jk, KC_MS_BTN1),
+    [kl_rclick] = COMBO(my_kl, KC_MS_BTN2),
     [jl_layer]  = COMBO_ACTION(my_jl),  // ← COMBO_ACTIONに変更！
 };
 
