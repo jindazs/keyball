@@ -25,7 +25,7 @@ jobs:
 
       - name: Build UF2 Firmware
         run: |
-          qmk compile -kb keyball/keyball39_rp2040 -km default
+          qmk compile -kb keyball/keyball39 -km via
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
