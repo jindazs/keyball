@@ -2,12 +2,47 @@ name: Build QMK UF2 Firmware (keyball39 RP2040)
 
 on:
   workflow_dispatch:
+    inputs:
+      qmk_version:
+        description: "Optional QMK version to install"
+        required: false
+        default: ""
+      keyboard:
+        description: "Keyboard to build (e.g. keyball39)"
+        required: false
+        default: "keyball39"
+      keymap:
+        description: "Keymap to build"
+        required: false
+        default: "via"
   push:
     branches: [ "main" ]
+  workflow_call:
+    inputs:
+      qmk_version:
+        description: "Optional QMK version to install"
+        required: false
+        type: string
+        default: ""
+      keyboard:
+        description: "Keyboard to build (e.g. keyball39)"
+        required: false
+        type: string
+        default: "keyball39"
+      keymap:
+        description: "Keymap to build"
+        required: false
+        type: string
+        default: "via"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      KEYBOARD: ${{ inputs.keyboard || github.event.inputs.keyboard || 'keyball39' }}
+      KEYMAP: ${{ inputs.keymap || github.event.inputs.keymap || 'via' }}
+      QMK_VERSION: ${{ inputs.qmk_version || github.event.inputs.qmk_version || '' }}
+      QMK_HOME: ${{ github.workspace }}/.qmk_home
 
     steps:
       - name: Checkout
@@ -21,14 +56,22 @@ jobs:
 
       - name: Setup QMK
         run: |
-          qmk setup -y
+          if [ -n "${QMK_VERSION}" ]; then
+            qmk setup -y -H "${QMK_HOME}" -b "${QMK_VERSION}"
+          else
+            qmk setup -y -H "${QMK_HOME}"
+          fi
+
+      - name: Copy custom keyball sources
+        run: |
+          rsync -a ./qmk_firmware/ "${QMK_HOME}/"
 
       - name: Build UF2 Firmware
         run: |
-          qmk compile -kb keyball/keyball39 -km via
+          qmk compile -kb keyball/${KEYBOARD} -km ${KEYMAP}
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: keyball39-rp2040-uf2
-          path: ./**/.uf2
+          path: ${{ env.QMK_HOME }}/**/*.uf2

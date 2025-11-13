@@ -1,8 +1,8 @@
 # MCU name
-MCU = atmega32u4
+MCU ?= atmega32u4
 
-# Bootloader selection
-BOOTLOADER = caterina
+# Bootloader selection happens in post_rules.mk so RP2040 keymaps can switch to
+# the correct bootloader/toolchain after their overrides have been evaluated.
 
 # Link Time Optimization required for size.
 LTO_ENABLE = yes
