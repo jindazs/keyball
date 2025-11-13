@@ -2,12 +2,46 @@ name: Build QMK UF2 Firmware (keyball39 RP2040)
 
 on:
   workflow_dispatch:
+    inputs:
+      qmk_version:
+        description: "Optional QMK version to install"
+        required: false
+        default: ""
+      keyboard:
+        description: "Keyboard to build (e.g. keyball39)"
+        required: false
+        default: "keyball39"
+      keymap:
+        description: "Keymap to build"
+        required: false
+        default: "via"
   push:
     branches: [ "main" ]
+  workflow_call:
+    inputs:
+      qmk_version:
+        description: "Optional QMK version to install"
+        required: false
+        type: string
+        default: ""
+      keyboard:
+        description: "Keyboard to build (e.g. keyball39)"
+        required: false
+        type: string
+        default: "keyball39"
+      keymap:
+        description: "Keymap to build"
+        required: false
+        type: string
+        default: "via"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      KEYBOARD: ${{ inputs.keyboard || github.event.inputs.keyboard || 'keyball39' }}
+      KEYMAP: ${{ inputs.keymap || github.event.inputs.keymap || 'via' }}
+      QMK_VERSION: ${{ inputs.qmk_version || github.event.inputs.qmk_version || '' }}
 
     steps:
       - name: Checkout
@@ -17,7 +51,11 @@ jobs:
 
       - name: Install QMK
         run: |
-          pip install qmk
+          if [ -n "${QMK_VERSION}" ]; then
+            pip install "qmk==${QMK_VERSION}"
+          else
+            pip install qmk
+          fi
 
       - name: Setup QMK
         run: |
@@ -25,7 +63,7 @@ jobs:
 
       - name: Build UF2 Firmware
         run: |
-          qmk compile -kb keyball/keyball39 -km via
+          qmk compile -kb keyball/${KEYBOARD} -km ${KEYMAP}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
