@@ -1,8 +1,8 @@
 # MCU name
-MCU = atmega32u4
+MCU ?= atmega32u4
 
 # Bootloader selection
-BOOTLOADER = caterina
+BOOTLOADER ?= caterina
 
 # Link Time Optimization required for size.
 LTO_ENABLE = yes
