@@ -1,20 +1,8 @@
 # MCU name
 MCU ?= atmega32u4
 
-# Bootloader selection
-BOOTLOADER ?= caterina
-
-# Select the toolchain platform based on the final MCU selection unless the
-# developer explicitly overrides it on the command line.  This allows RP2040
-# keymaps (which set `MCU = RP2040`) to automatically switch to the ChibiOS
-# toolchain while keeping the AVR defaults for the stock keymaps.
-ifeq ($(origin PLATFORM), default)
-    ifneq ($(filter RP2040,$(strip $(MCU))),)
-        PLATFORM = chibios
-    else
-        PLATFORM = avr
-    endif
-endif
+# Bootloader selection happens in post_rules.mk so RP2040 keymaps can switch to
+# the correct bootloader/toolchain after their overrides have been evaluated.
 
 # Link Time Optimization required for size.
 LTO_ENABLE = yes
