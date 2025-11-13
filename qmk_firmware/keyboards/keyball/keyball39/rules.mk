@@ -4,13 +4,8 @@ MCU ?= atmega32u4
 # Bootloader selection
 BOOTLOADER ?= caterina
 
-# Default to the AVR toolchain unless a keymap explicitly switches the MCU.
-# RP2040 builds need the ChibiOS platform, and keymaps override the MCU after
-# this file has been parsed, so use a deferred assignment that tracks the final
-# MCU value instead of deciding eagerly.
-ifeq ($(origin PLATFORM), undefined)
-    PLATFORM = $(if $(filter RP2040,$(strip $(MCU))), chibios, avr)
-endif
+# Default to the AVR toolchain; RP2040 builds switch to ChibiOS in post_rules.mk.
+PLATFORM ?= avr
 
 # Link Time Optimization required for size.
 LTO_ENABLE = yes
