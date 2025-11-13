@@ -21,15 +21,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Key matrix parameters
 #define MATRIX_ROWS         (4 * 2)  // split keyboard
 #define MATRIX_COLS         6
-#define MATRIX_ROW_PINS     { F4, F5, F6, F7 }
-#define MATRIX_COL_PINS     { D4, C6, D7, E6, B4, B5 }
+
+#if defined(__AVR__)
+#    define MATRIX_ROW_PINS     { F4, F5, F6, F7 }
+#    define MATRIX_COL_PINS     { D4, C6, D7, E6, B4, B5 }
+#    define SOFT_SERIAL_PIN         D2
+#    define SPLIT_HAND_MATRIX_GRID  F6, B5
+#    define WS2812_DI_PIN           D3
+#else
+#    define MATRIX_ROW_PINS     { GP29, GP28, GP27, GP26 }
+#    define MATRIX_COL_PINS     { GP4, GP5, GP6, GP7, GP8, GP9 }
+#    define SOFT_SERIAL_PIN         GP2
+#    define SPLIT_HAND_MATRIX_GRID  GP27, GP9
+#    define WS2812_DI_PIN           GP3
+#endif
 #define MATRIX_MASKED
 #define DEBOUNCE            5
 #define DIODE_DIRECTION     COL2ROW
 
 // Split parameters
-#define SOFT_SERIAL_PIN         D2
-#define SPLIT_HAND_MATRIX_GRID  F6, B5
 #define SPLIT_USB_DETECT
 #ifdef OLED_ENABLE
 #    define SPLIT_OLED_ENABLE
@@ -43,7 +53,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SPLIT_TRANSACTION_IDS_KB KEYBALL_GET_INFO, KEYBALL_GET_MOTION, KEYBALL_SET_CPI
 
 // RGB LED settings
-#define WS2812_DI_PIN       D3
 #ifdef RGBLIGHT_ENABLE
 #    define RGBLED_NUM      48
 #    define RGBLED_SPLIT    { 24, 24 }  // (24 + 22)
