@@ -42,6 +42,7 @@ jobs:
       KEYBOARD: ${{ inputs.keyboard || github.event.inputs.keyboard || 'keyball39' }}
       KEYMAP: ${{ inputs.keymap || github.event.inputs.keymap || 'via' }}
       QMK_VERSION: ${{ inputs.qmk_version || github.event.inputs.qmk_version || '' }}
+      QMK_HOME: ${{ github.workspace }}/.qmk_home
 
     steps:
       - name: Checkout
@@ -56,10 +57,14 @@ jobs:
       - name: Setup QMK
         run: |
           if [ -n "${QMK_VERSION}" ]; then
-            qmk setup -y -b "${QMK_VERSION}"
+            qmk setup -y -H "${QMK_HOME}" -b "${QMK_VERSION}"
           else
-            qmk setup -y
+            qmk setup -y -H "${QMK_HOME}"
           fi
+
+      - name: Copy custom keyball sources
+        run: |
+          rsync -a ./qmk_firmware/ "${QMK_HOME}/"
 
       - name: Build UF2 Firmware
         run: |
@@ -69,4 +74,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: keyball39-rp2040-uf2
-          path: ./**/.uf2
+          path: ${{ env.QMK_HOME }}/**/*.uf2
