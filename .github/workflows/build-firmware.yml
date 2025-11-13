@@ -28,7 +28,7 @@ jobs:
           qmk compile -kb keyball/keyball39 -km via
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: keyball39-rp2040-uf2
           path: ./**/.uf2
