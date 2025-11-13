@@ -51,15 +51,15 @@ jobs:
 
       - name: Install QMK
         run: |
-          if [ -n "${QMK_VERSION}" ]; then
-            pip install "qmk==${QMK_VERSION}"
-          else
-            pip install qmk
-          fi
+          pip install qmk
 
       - name: Setup QMK
         run: |
-          qmk setup -y
+          if [ -n "${QMK_VERSION}" ]; then
+            qmk setup -y -b "${QMK_VERSION}"
+          else
+            qmk setup -y
+          fi
 
       - name: Build UF2 Firmware
         run: |
