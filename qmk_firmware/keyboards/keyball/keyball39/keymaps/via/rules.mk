@@ -13,3 +13,4 @@ RGBLIGHT_ENABLE = no
 OLED_ENABLE = no
 
 EXTRAFLAGS += -Wno-error=unused-const-variable
+BOOTLOADER = rp2040
