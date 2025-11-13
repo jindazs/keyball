@@ -1,49 +1,34 @@
-name: Build a firmware
+name: Build QMK UF2 Firmware (keyball39 RP2040)
 
 on:
-
-  workflow_call:
-    inputs:
-      qmk_version:
-        default: '0.22.14'
-        type: string
-        required: false
-      keyboard:
-        type: string
-        required: true
-      keymap:
-        type: string
-        required: true
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
 
 jobs:
-
   build:
-
-    name: Build a firmware ${{ inputs.keyboard }}:${{ inputs.keymap }}
-
-    runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/qmk/qmk_cli:latest
+    runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: Checkout source
-      uses: actions/checkout@v4
+      - name: Install QMK
+        run: |
+          pip install qmk
 
-    - name: Checkout qmk_firmware
-      uses: ./.github/actions/checkout-qmk_firmware
+      - name: Setup QMK
+        run: |
+          qmk setup -y
 
-    - name: Install a link to own source
-      run: ln -s $(pwd)/qmk_firmware/keyboards/keyball __qmk__/keyboards/keyball
+      - name: Build UF2 Firmware
+        run: |
+          qmk compile -kb keyball/keyball39_rp2040 -km default
 
-    - name: Install missing python modules
-      run: /usr/bin/python3 -m pip install -r __qmk__/requirements.txt
-
-    - name: Compile and link
-      run: qmk compile -j 4 -kb keyball/${{ inputs.keyboard }} -km ${{ inputs.keymap }}
-
-    - name: Archive built firmware
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ inputs.keyboard }}-${{ inputs.keymap }}-firmware
-        path: __qmk__/*.hex
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: keyball39-rp2040-uf2
+          path: ./**/.uf2
