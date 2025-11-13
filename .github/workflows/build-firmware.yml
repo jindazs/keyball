@@ -1,13 +1,53 @@
-name: Build QMK UF2 Firmware (keyball39 RP2040)
+name: Build QMK Firmware
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
+    inputs:
+      qmk_version:
+        description: 'QMK CLI version'
+        default: '0.22.14'
+        required: true
+        type: string
+      keyboard:
+        description: 'Keyboard'
+        required: true
+        default: keyball39
+        type: choice
+        options:
+          - keyball39
+          - keyball44
+          - keyball61
+          - keyball46
+          - one47
+      keymap:
+        description: 'Keymap'
+        required: true
+        default: via
+        type: string
+
+  workflow_call:
+    inputs:
+      qmk_version:
+        description: 'QMK CLI version'
+        default: '0.22.14'
+        required: false
+        type: string
+      keyboard:
+        description: 'Keyboard name (without the keyball/ prefix)'
+        required: true
+        type: string
+      keymap:
+        description: 'Keymap name'
+        required: true
+        type: string
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      INPUT_QMK_VERSION: ${{ inputs.qmk_version }}
+      INPUT_KEYBOARD: ${{ inputs.keyboard }}
+      INPUT_KEYMAP: ${{ inputs.keymap }}
 
     steps:
       - name: Checkout
@@ -15,20 +55,33 @@ jobs:
         with:
           submodules: true
 
+      - name: Determine build parameters
+        id: build-params
+        run: |
+          KEYBOARD="${INPUT_KEYBOARD:-keyball39}"
+          KEYMAP="${INPUT_KEYMAP:-via}"
+          QMK_VERSION="${INPUT_QMK_VERSION:-0.22.14}"
+
+          echo "keyboard=${KEYBOARD}" >> "$GITHUB_OUTPUT"
+          echo "keymap=${KEYMAP}" >> "$GITHUB_OUTPUT"
+          echo "qmk_version=${QMK_VERSION}" >> "$GITHUB_OUTPUT"
+
       - name: Install QMK
         run: |
-          pip install qmk
+          pip install "qmk==${{ steps.build-params.outputs.qmk_version }}"
 
       - name: Setup QMK
         run: |
           qmk setup -y
 
-      - name: Build UF2 Firmware
+      - name: Build firmware
         run: |
-          qmk compile -kb keyball/keyball39_rp2040 -km default
+          qmk compile -kb keyball/${{ steps.build-params.outputs.keyboard }} -km ${{ steps.build-params.outputs.keymap }}
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: keyball39-rp2040-uf2
-          path: ./**/.uf2
+          name: ${{ steps.build-params.outputs.keyboard }}-${{ steps.build-params.outputs.keymap }}-firmware
+          path: |
+            qmk_firmware/.build/*.hex
+            qmk_firmware/.build/*.uf2
