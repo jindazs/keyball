@@ -69,3 +69,15 @@ void oledkit_render_info_user(void) {
     keyball_oled_render_layerinfo();
 }
 #endif
+
+#ifdef COMBO_ENABLE
+enum combo_events {
+    LRCLICK_TO_SCRL,
+};
+
+const uint16_t PROGMEM lrclick_combo[] = {KC_BTN1, KC_BTN2, COMBO_END};
+
+combo_t key_combos[] = {
+    [LRCLICK_TO_SCRL] = COMBO(lrclick_combo, SCRL_MO),
+};
+#endif
